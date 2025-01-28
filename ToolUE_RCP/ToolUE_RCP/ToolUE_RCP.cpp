@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <fstream>
 using namespace std;
 #include <string>
 #include "json.hpp"
@@ -10,10 +11,20 @@ string HOWTOUSE =
     "ToolUE_RCP [CHEMIN DU UPROJECT] build\n"
     "ToolUE_RCP [CHEMIN DU UPROJECT] package [CHEMIN DU PACKAGE]\n";
 
-void showinfo(string pathToUproj)
+void showinfo(const string& pathToUproj)
 {
     //TODO
     printf("%s\n", pathToUproj.c_str());
+    
+    ifstream file(pathToUproj);
+    if (!file.is_open())
+    {
+        printf("Error in opening file\n");
+        return;
+    }
+    json UPROJ_data = json::parse(file);
+    if (UPROJ_data.contains("Modules")) {printf("lezgo");return;}
+    printf("%s\n", UPROJ_data.dump().c_str());
 }
 
 void build(string pathToUproj)
@@ -37,9 +48,9 @@ int main(int argc, char* argv[])
         return 1;
     }
     
-    if (strcmp(argv[2], "show-infos") == 0){ showinfo("Test show infos"); }
-    else if (strcmp(argv[2], "build") == 0){ build("Test build"); }
-    else if (strcmp(argv[2], "package") == 0 && argc == 4){ package("Test package", argv[3]); }
+    if (strcmp(argv[2], "show-infos") == 0){ showinfo(argv[1]); }
+    else if (strcmp(argv[2], "build") == 0){ build(argv[1]); }
+    else if (strcmp(argv[2], "package") == 0 && argc == 4){ package(argv[1], argv[3]); }
     else
     {
         printf(HOWTOUSE.c_str());
