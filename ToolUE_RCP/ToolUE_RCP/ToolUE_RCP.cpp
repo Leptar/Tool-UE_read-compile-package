@@ -25,12 +25,11 @@ void showinfo(const string& pathToUproj)
         return;
     }
     json UPROJ_data = json::parse(file);
-
+    filesystem::path p(pathToUproj);
     // Print the project name
     string projectName;
     if (!UPROJ_data.contains("Modules"))
     {
-       filesystem::path p(pathToUproj);
         projectName = p.stem().string();
     } else
     {
@@ -38,7 +37,24 @@ void showinfo(const string& pathToUproj)
     }
     printf("Project Name : %s\n", projectName.c_str());
 
-    
+    // Print UE Version
+    string UEVersion;
+    if (!UPROJ_data.contains("EngineAssociation"))
+    {
+        UEVersion = "Error : Engine Association not found";
+    } else
+    {
+        UEVersion = UPROJ_data["EngineAssociation"];
+        if (UEVersion.length() > 4) { UEVersion += " (From source)"; }
+    }
+    printf("UE version : %s\n", UEVersion.c_str());
+
+    // Print Plugins
+    printf("Plugins :\n");
+    for (auto jsonrow : UPROJ_data["Plugins"])
+    {
+        printf("\t %s\n", jsonrow["Name"].get<string>().c_str());
+    }
 }
 
 void build(const string& pathToUproj)
