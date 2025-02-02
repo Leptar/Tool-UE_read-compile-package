@@ -14,8 +14,6 @@ string HOW_TO_USE =
 
 void showinfo(const string& pathToUproj)
 {
-    //TODO
-
     // try to open file
     ifstream file(pathToUproj);
     if (!file.is_open())
@@ -25,11 +23,12 @@ void showinfo(const string& pathToUproj)
         return;
     }
     json UPROJ_data = json::parse(file);
-    filesystem::path p(pathToUproj);
+    
     // Print the project name
     string projectName;
     if (!UPROJ_data.contains("Modules"))
     {
+        filesystem::path p(pathToUproj);
         projectName = p.stem().string();
     } else
     {
@@ -60,15 +59,39 @@ void showinfo(const string& pathToUproj)
 void build(const string& pathToUproj)
 {
     //TODO
-    printf("%s\n", pathToUproj.c_str());
+    // try to open file
+    ifstream file(pathToUproj);
+    if (!file.is_open())
+    {
+        printf("Error in opening file. Check if there is no error on the path\n");
+        printf("%s\n", HOW_TO_USE.c_str());
+        return;
+    }
+    json UPROJ_data = json::parse(file);
+
+    // get project name
+    string projectName;
+    if (!UPROJ_data.contains("Modules"))
+    {
+        filesystem::path p(pathToUproj);
+        projectName = p.stem().string();
+    } else
+    {
+        projectName = UPROJ_data["Modules"][0]["Name"];
+    }
+    // Path to build.bat from UE from source
+    string cml = "C:\\UE-5.5\\UnrealEngine\\Engine\\Build\\BatchFiles\\Build.bat "
+                + projectName + " Win64 development " + pathToUproj + " -waitmutex";
+    system(cml.c_str());
+    
 }
 
 void package(const string& pathToUproj, const string& pathToPackage)
 {
     //TODO
+    string cml = "C:\\UE-5.5\\UnrealEngine\\Engine\\Build\\BatchFiles\\RunUAT.bat ";
     printf("%s\n%s", pathToUproj.c_str(), pathToPackage.c_str());
 }
-
 
 int main(int argc, char* argv[])
 {
