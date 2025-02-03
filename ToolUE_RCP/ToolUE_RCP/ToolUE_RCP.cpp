@@ -61,7 +61,6 @@ void showinfo(const string& pathToUproj)
 
 void build(const string& pathToUproj)
 {
-    //TODO
     // try to open file
     ifstream file(pathToUproj);
     if (!file.is_open())
@@ -82,7 +81,8 @@ void build(const string& pathToUproj)
     {
         projectName = UPROJ_data["Modules"][0]["Name"];
     }
-    // Path to build.bat from UE from source
+    
+    // Path to build.bat from UE from source (UBT)
     string cml = ".\\Engine\\Build\\BatchFiles\\Build.bat "
                 + projectName + " Win64 development " + pathToUproj + " -waitmutex";
     system(cml.c_str());
@@ -91,6 +91,7 @@ void build(const string& pathToUproj)
 
 void package(const string& pathToUproj, const string& pathToPackage)
 {
+    // check if uproject exists
     struct stat sb;
     if (!(stat(pathToUproj.c_str(), &sb) == 0 && !(sb.st_mode & S_IFDIR)))
     {
@@ -99,6 +100,7 @@ void package(const string& pathToUproj, const string& pathToPackage)
         return;
     }
 
+    // Command line for UAT
     string cml = ".\\Engine\\Build\\BatchFiles\\RunUAT.bat -ScriptsForProject=" + pathToUproj
                 +" BuildCookRun -project=" + pathToUproj +" -platform=Win64 -clientconfig=Development -cook -pak -stage -archive "
                  "-archivedirectory=" + pathToPackage;
