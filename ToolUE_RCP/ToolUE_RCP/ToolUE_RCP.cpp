@@ -1,16 +1,19 @@
 #include <cstdio>
 #include <fstream>
 #include <string>
-#include "filesystem" 
+#include "filesystem"
+#include <sys/stat.h>
 #include "json.hpp"
 using namespace std;
 using json = nlohmann::json;
 
 string HOW_TO_USE =
     "How to use ToolUE_RCP :\n"
-    "ToolUE_RCP [PATH TO UPROJECT] show-infos\n"
-    "ToolUE_RCP [PATH TO UPROJECT] build\n"
-    "ToolUE_RCP [PATH TO UPROJECT] package [PATH TO PACKAGE]\n";
+    "Put the .exe file, in Unreal Engine directory (Need to be an Unreal Engine from source)\n"
+    "Commands lines :\n"
+    "\t[ToolUE_RCP or exe path] [PATH TO UPROJECT] show-infos\n"
+    "\t[ToolUE_RCP or exe path] [PATH TO UPROJECT] build\n"
+    "\t[ToolUE_RCP or exe path] [PATH TO UPROJECT] package [PATH TO PACKAGE]\n";
 
 void showinfo(const string& pathToUproj)
 {
@@ -80,7 +83,7 @@ void build(const string& pathToUproj)
         projectName = UPROJ_data["Modules"][0]["Name"];
     }
     // Path to build.bat from UE from source
-    string cml = "C:\\UE-5.5\\UnrealEngine\\Engine\\Build\\BatchFiles\\Build.bat "
+    string cml = ".\\Engine\\Build\\BatchFiles\\Build.bat "
                 + projectName + " Win64 development " + pathToUproj + " -waitmutex";
     system(cml.c_str());
     
@@ -89,7 +92,21 @@ void build(const string& pathToUproj)
 void package(const string& pathToUproj, const string& pathToPackage)
 {
     //TODO
-    string cml = "C:\\UE-5.5\\UnrealEngine\\Engine\\Build\\BatchFiles\\RunUAT.bat ";
+    struct stat sb;
+    if (!(stat(pathToUproj.c_str(), &sb) == 0 && !(sb.st_mode & S_IFDIR)))
+    {
+        printf("Error in opening file. Check if there is no error on the path\n");
+        printf("%s\n", HOW_TO_USE.c_str());
+        return;
+    }
+    
+    if (stat(pathToPackage.c_str(), &sb) != 0)
+    {
+        printf("Error in package path. Check if there is no error on the path\n");
+        printf("%s\n", HOW_TO_USE.c_str());
+        return;
+    }
+    string cml = ".\\Engine\\Build\\BatchFiles\\RunUAT.bat ";
     printf("%s\n%s", pathToUproj.c_str(), pathToPackage.c_str());
 }
 
