@@ -91,7 +91,6 @@ void build(const string& pathToUproj)
 
 void package(const string& pathToUproj, const string& pathToPackage)
 {
-    //TODO
     struct stat sb;
     if (!(stat(pathToUproj.c_str(), &sb) == 0 && !(sb.st_mode & S_IFDIR)))
     {
@@ -99,15 +98,11 @@ void package(const string& pathToUproj, const string& pathToPackage)
         printf("%s\n", HOW_TO_USE.c_str());
         return;
     }
-    
-    if (stat(pathToPackage.c_str(), &sb) != 0)
-    {
-        printf("Error in package path. Check if there is no error on the path\n");
-        printf("%s\n", HOW_TO_USE.c_str());
-        return;
-    }
-    string cml = ".\\Engine\\Build\\BatchFiles\\RunUAT.bat ";
-    printf("%s\n%s", pathToUproj.c_str(), pathToPackage.c_str());
+
+    string cml = ".\\Engine\\Build\\BatchFiles\\RunUAT.bat -ScriptsForProject=" + pathToUproj
+                +" BuildCookRun -project=" + pathToUproj +" -platform=Win64 -clientconfig=Development -cook -pak -stage -archive "
+                 "-archivedirectory=" + pathToPackage;
+    system(cml.c_str());
 }
 
 int main(int argc, char* argv[])
